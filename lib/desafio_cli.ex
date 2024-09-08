@@ -9,12 +9,14 @@ defmodule DesafioCli do
   """
 
   alias StringResolver
+  alias TypeConverter
 
   def main(_args) do
     command = IO.gets(">")
 
     String.split(command, ", ")
-    |> Enum.map(&StringResolver.resolve_string/1)
+    # |> Enum.map(&StringResolver.resolve_string/1)
+    |> Enum.map(&TypeConverter.convert/1)
     |> Enum.each(&IO.inspect/1)
   end
 end
