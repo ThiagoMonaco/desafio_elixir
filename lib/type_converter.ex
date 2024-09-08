@@ -8,6 +8,12 @@ defmodule TypeConverter do
   @spec convert(String.t) :: boolean 
   def convert("FALSE"), do: false
 
+  @spec convert(String.t) :: nil
+  def convert("nil"), do: nil
+
+  @spec convert(String.t) :: nil
+  def convert(nil), do: nil
+
   @spec convert(String.t) :: String.t | integer
   def convert(str) do
     case Integer.parse(str) do

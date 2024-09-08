@@ -21,4 +21,12 @@ defmodule TypeConverterTest do
   test "Should convert string 123 to string 123" do
     assert TypeConverter.convert(~s("123")) == "123"
   end
+
+  test "should convert nil to nil" do
+    assert TypeConverter.convert(nil) == nil
+  end
+
+  test "should convert string nil to nil" do
+    assert TypeConverter.convert(~s(nil)) == nil
+  end
 end
