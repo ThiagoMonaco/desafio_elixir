@@ -16,6 +16,12 @@ defmodule Commands do
     end
   end
 
+  @spec command([String.t() | integer | boolean | nil]) :: String.t()
+  def command(["BEGIN"] = _args) do
+    DatabaseMap.start_transaction()
+    ~s(OK)
+  end
+
   @spec command([String.t]) :: any
   def command([str_command | _rest]), do: ~s(ERR: "No command #{str_command}")
 end

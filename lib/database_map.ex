@@ -6,19 +6,29 @@ defmodule DatabaseMap do
     GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
-  @spec init(nil) :: {:ok, %{}}
+  @spec init(nil) :: {:ok, [%{}]}
   def init(nil) do
-    {:ok, %{}}
+    {:ok, [%{}]}
   end
 
   @spec handle_call({:get, String.t}, any, map()) :: {:reply, any, map()}
   def handle_call({:get, key}, _from, state) do
-    {:reply, Map.get(state, key), state}
+    current_transaction = search_key(Enum.reverse(state), key)
+
+    {:reply, Map.get(current_transaction, key), state}
   end
 
   @spec handle_call({:set, String.t, any}, any, map()) :: {:reply, any, map()}
-  def handle_call({:put, key, value}, _from, state) do
-    {:reply, :ok, Map.put(state, key, value)}
+  def handle_call({:set, key, value}, _from, state) do
+    reversed_state = Enum.reverse(state)
+    [head | tail] = reversed_state
+    new_state = [Map.put(head, key, value) | tail]
+      
+    {:reply, :ok, Enum.reverse(new_state)}
+  end
+
+  def handle_call({:start_transaction}, _from, state) do
+    {:reply, :ok, state ++ [%{}]}
   end
 
   @spec get(String.t) :: {:ok, any}, {:error, :not_found}
@@ -37,12 +47,26 @@ defmodule DatabaseMap do
        {:error, :not_found} -> false        
     end
 
-    GenServer.call(__MODULE__, {:put, key, value})
+    GenServer.call(__MODULE__, {:set, key, value})
    
     if existing_value do
       {:ok, :existing}
     else
       {:ok, :new}
     end
+  end
+
+  def search_key([], _key), do: %{}
+  def search_key([head | tail], key) do
+    IO.inspect(head)
+    if Map.has_key?(head, key) do
+      head
+    else
+      search_key(tail, key)
+    end
+  end
+
+  def start_transaction do
+    GenServer.call(__MODULE__, {:start_transaction})
   end
 end
