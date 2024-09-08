@@ -8,14 +8,14 @@ defmodule Commands do
     end
   end
 
-  @spec command([String.t() | integer | boolean | nil]) :: any
+  @spec command([String.t() | integer | boolean | nil]) :: String.t()
   def command(["GET", key] = _args) do
     case DatabaseMap.get(key) do
-      {:ok, value} -> value
-      {:error, :not_found} -> nil
+      {:ok, value} -> ~s(#{value})
+      {:error, :not_found} -> ~s(nil)
     end
   end
 
   @spec command([String.t]) :: any
-  def command([str_command]), do: ~s(ERR: "No command #{str_command}")
+  def command([str_command | _rest]), do: ~s(ERR: "No command #{str_command}")
 end

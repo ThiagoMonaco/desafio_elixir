@@ -19,4 +19,8 @@ defmodule CommandsTest do
   test "Should return error message when command is invalid" do
     assert ~s(ERR: "No command INVALID") == Commands.command(["INVALID"])
   end
+
+  test "Should return error message when command is invalid with more than one argument" do
+    assert ~s(ERR: "No command INVALID") == Commands.command(["INVALID", "arg1", "arg2"])
+  end
 end
