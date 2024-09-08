@@ -9,19 +9,20 @@ defmodule DesafioCli do
   """
   alias TypeConverter
   alias DatabaseMap
+  alias Commands
+
+  def execute do
+    command = IO.gets(">") |> String.trim()
+
+    String.split(command, " ")
+    |> Enum.map(&TypeConverter.convert/1)
+    |> Commands.command()
+
+    execute()
+  end
 
   def main(_args) do
-    command = IO.gets(">")
-
     DatabaseMap.start_link()
-    DatabaseMap.put("key1", "value1")
-    DatabaseMap.put("key2", "value2")
-
-    IO.inspect(DatabaseMap.get("key1"))
-    IO.inspect(DatabaseMap.get("key2"))
-
-    String.split(command, ", ")
-    |> Enum.map(&TypeConverter.convert/1)
-    |> Enum.each(&IO.inspect/1)
+    execute()
   end
 end
