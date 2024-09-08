@@ -7,12 +7,16 @@ defmodule CommandsTest do
   end
 
   test "Should store a value" do
-    Commands.command(["SET", "key1", "value1"])
+    assert ~s(FALSE value1) == Commands.command(["SET", "key1", "value1"])
     assert {:ok, "value1"} == DatabaseMap.get("key1")
   end
 
   test "Should retrieve a value" do
-    DatabaseMap.put("key2", "value2")
-    assert {:ok, "value2"} == Commands.command(["GET", "key2"])
+    DatabaseMap.set("key2", "value2")
+    assert "value2" == Commands.command(["GET", "key2"])
+  end
+
+  test "Should return error message when command is invalid" do
+    assert ~s(ERR: "No command INVALID") == Commands.command(["INVALID"])
   end
 end

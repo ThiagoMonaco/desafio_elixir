@@ -1,18 +1,21 @@
 defmodule Commands do
 
-  @spec command([String.t() | integer | boolean | nil]) :: :ok
+  @spec command([String.t() | integer | boolean | nil]) :: String.t()
   def command(["SET", key, value] = _args) do
-    DatabaseMap.put(key, value)
+    case DatabaseMap.set(key, value) do
+      {:ok, :new} -> ~s(FALSE #{value})
+      {:ok, :existing} -> ~s(TRUE #{value})
+    end
   end
 
-  @spec command([String.t() | integer | boolean | nil]) :: :ok
+  @spec command([String.t() | integer | boolean | nil]) :: any
   def command(["GET", key] = _args) do
-    DatabaseMap.get(key)
-    |> IO.inspect()
+    case DatabaseMap.get(key) do
+      {:ok, value} -> value
+      {:error, :not_found} -> nil
+    end
   end
 
   @spec command([String.t]) :: any
-  def command([str_command]) do
-    IO.puts("Comando inválido")
-  end
+  def command([str_command]), do: ~s(ERR: "No command #{str_command}")
 end

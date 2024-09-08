@@ -30,8 +30,8 @@ defmodule DatabaseMap do
     end
   end
 
-  @spec put(String.t, any) :: {:ok, :new} | {:ok, :existing}
-  def put(key, value) do
+  @spec set(String.t, any) :: {:ok, :new} | {:ok, :existing}
+  def set(key, value) do
     existing_value = case get(key) do
        {:ok, _any} -> true
        {:error, :not_found} -> false        
