@@ -25,7 +25,7 @@ defmodule DatabaseMap do
   end
 
   def handle_call({:start_transaction}, _from, state) do
-    {:reply, :ok, state ++ [%{}]}
+    {:reply, {:ok, length(state)}, state ++ [%{}]}
   end
 
   def handle_call({:commit_transaction}, _from, state) do
@@ -33,9 +33,23 @@ defmodule DatabaseMap do
     [new_head | new_tail] = tail
     new_state = [Map.merge(new_head, head) | new_tail]
 
-    {:reply, :ok, Enum.reverse(new_state)}
+    {:reply, {:ok, length(new_state) - 1}, Enum.reverse(new_state)}
   end
 
+  def handle_call({:rollback}, _from, state) do
+    [_head | tail] = Enum.reverse(state)
+    {:reply, {:ok, length(tail) - 1}, Enum.reverse(tail)}
+  end
+
+  @spec search_key([map], String.t) :: map
+  def search_key([], _key), do: %{}
+  def search_key([head | tail], key) do
+    if Map.has_key?(head, key) do
+      head
+    else
+      search_key(tail, key)
+    end
+  end
 
   @spec get(String.t) :: {:ok, any}, {:error, :not_found}
   def get(key) do
@@ -62,21 +76,18 @@ defmodule DatabaseMap do
     end
   end
 
-  def search_key([], _key), do: %{}
-  def search_key([head | tail], key) do
-    IO.inspect(head)
-    if Map.has_key?(head, key) do
-      head
-    else
-      search_key(tail, key)
-    end
-  end
-
+  @spec start_transaction() :: {:ok, integer}
   def start_transaction do
     GenServer.call(__MODULE__, {:start_transaction})
   end
 
+  @spec commit_transaction() :: {:ok, integer}
   def commit_transaction do
     GenServer.call(__MODULE__, {:commit_transaction})
+  end
+
+  @spec rollback() :: {:ok, integer}
+  def rollback do
+    GenServer.call(__MODULE__, {:rollback})
   end
 end

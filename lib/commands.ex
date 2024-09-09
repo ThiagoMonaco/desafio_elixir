@@ -12,20 +12,26 @@ defmodule Commands do
   def command(["GET", key] = _args) do
     case DatabaseMap.get(key) do
       {:ok, value} -> ~s(#{value})
-      {:error, :not_found} -> ~s(nil)
+      {:error, :not_found} -> ~s(NIL)
     end
   end
 
   @spec command([String.t() | integer | boolean | nil]) :: String.t()
   def command(["BEGIN"] = _args) do
-    DatabaseMap.start_transaction()
-    ~s(OK)
+    {:ok, deep} = DatabaseMap.start_transaction()
+    ~s(#{deep})
   end
 
   @spec command([String.t() | integer | boolean | nil]) :: String.t()
   def command(["COMMIT"] = _args) do
-    DatabaseMap.commit_transaction()
-    ~s(OK)
+    {:ok, deep} = DatabaseMap.commit_transaction()
+    ~s(#{deep})
+  end
+
+  @spec command([String.t() | integer | boolean | nil]) :: String.t()
+  def command(["ROLLBACK"] = _args) do
+    {:ok, deep} = DatabaseMap.rollback()
+    ~s(#{deep})
   end
 
   @spec command([String.t]) :: any
