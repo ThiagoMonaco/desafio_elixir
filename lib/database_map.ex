@@ -6,19 +6,16 @@ defmodule DatabaseMap do
     GenServer.start_link(__MODULE__, nil, name: __MODULE__)
   end
 
-  @spec init(nil) :: {:ok, [%{}]}
   def init(nil) do
     {:ok, [%{}]}
   end
 
-  @spec handle_call({:get, String.t}, any, map()) :: {:reply, any, map()}
   def handle_call({:get, key}, _from, state) do
     current_transaction = search_key(Enum.reverse(state), key)
 
     {:reply, Map.get(current_transaction, key), state}
   end
 
-  @spec handle_call({:set, String.t, any}, any, map()) :: {:reply, any, map()}
   def handle_call({:set, key, value}, _from, state) do
     reversed_state = Enum.reverse(state)
     [head | tail] = reversed_state
@@ -30,6 +27,15 @@ defmodule DatabaseMap do
   def handle_call({:start_transaction}, _from, state) do
     {:reply, :ok, state ++ [%{}]}
   end
+
+  def handle_call({:commit_transaction}, _from, state) do
+    [head | tail] = Enum.reverse(state)
+    [new_head | new_tail] = tail
+    new_state = [Map.merge(new_head, head) | new_tail]
+
+    {:reply, :ok, Enum.reverse(new_state)}
+  end
+
 
   @spec get(String.t) :: {:ok, any}, {:error, :not_found}
   def get(key) do
@@ -68,5 +74,9 @@ defmodule DatabaseMap do
 
   def start_transaction do
     GenServer.call(__MODULE__, {:start_transaction})
+  end
+
+  def commit_transaction do
+    GenServer.call(__MODULE__, {:commit_transaction})
   end
 end

@@ -34,5 +34,22 @@ defmodule DatabaseMapTest do
 
     assert {:ok, true} == DatabaseMap.get("key4")
   end
+
+  test "Should overwrites a value for an existing key when in a new transaction" do
+    DatabaseMap.set("key5", "initial_value")
+    DatabaseMap.start_transaction()
+    DatabaseMap.set("key5", "new_value")
+
+    assert {:ok, "new_value"} == DatabaseMap.get("key5")
+  end
+
+  test "Should apply transaction changes after commit" do
+    DatabaseMap.set("key6", "initial_value")
+    DatabaseMap.start_transaction()
+    DatabaseMap.set("key6", "new_value")
+    DatabaseMap.commit_transaction()
+
+    assert {:ok, "new_value"} == DatabaseMap.get("key6")
+  end
 end
 

@@ -22,6 +22,12 @@ defmodule Commands do
     ~s(OK)
   end
 
+  @spec command([String.t() | integer | boolean | nil]) :: String.t()
+  def command(["COMMIT"] = _args) do
+    DatabaseMap.commit_transaction()
+    ~s(OK)
+  end
+
   @spec command([String.t]) :: any
   def command([str_command | _rest]), do: ~s(ERR: "No command #{str_command}")
 end
