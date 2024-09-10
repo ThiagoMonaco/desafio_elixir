@@ -15,7 +15,6 @@ defmodule DesafioCli do
     command = IO.gets("> ") |> String.trim()
 
     String.split(command, " ", parts: 3)
-    |> IO.inspect()
     |> Enum.map(&TypeConverter.convert/1)
     |> Commands.command()
     |> IO.puts()
