@@ -9,7 +9,7 @@ defmodule TypeConverter do
   def convert("FALSE"), do: false
 
   @spec convert(String.t) :: nil
-  def convert("nil"), do: nil
+  def convert("NIL"), do: nil
 
   @spec convert(String.t) :: nil
   def convert(nil), do: nil

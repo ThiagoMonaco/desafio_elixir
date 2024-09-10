@@ -27,6 +27,6 @@ defmodule TypeConverterTest do
   end
 
   test "should convert string nil to nil" do
-    assert TypeConverter.convert(~s(nil)) == nil
+    assert TypeConverter.convert(~s(NIL)) == nil
   end
 end

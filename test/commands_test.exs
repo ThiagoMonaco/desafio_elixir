@@ -23,4 +23,24 @@ defmodule CommandsTest do
   test "Should return error message when command is invalid with more than one argument" do
     assert ~s(ERR: "No command INVALID") == Commands.command(["INVALID", "arg1", "arg2"])
   end
+
+  test "Should return error message when SET command is invalid" do
+    assert ~s(ERR "SET <chave> <valor> - Syntax error") == Commands.command(["SET"])
+  end
+
+  test "Should return error message when GET command is invalid" do
+    assert ~s(ERR "GET <chave> - Syntax error") == Commands.command(["GET"])
+  end
+
+  test "Should return error message when BEGIN command is invalid" do
+    assert ~s(ERR "BEGIN - Syntax error") == Commands.command(["BEGIN", "arg1"])
+  end
+
+  test "Should return error message when COMMIT command is invalid" do
+    assert ~s(ERR "COMMIT - Syntax error") == Commands.command(["COMMIT", "arg1"])
+  end
+
+  test "Should return error message when ROLLBACK command is invalid" do
+    assert ~s(ERR "ROLLBACK - Syntax error") == Commands.command(["ROLLBACK", "arg1"])
+  end
 end

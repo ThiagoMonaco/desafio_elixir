@@ -12,9 +12,9 @@ defmodule DesafioCli do
   alias Commands
 
   def execute do
-    command = IO.gets("> ") |> String.trim()
-
-    String.split(command, " ", parts: 3)
+    IO.gets("> ")
+    |> String.trim()
+    |> String.split(" ", parts: 3)
     |> Enum.map(&TypeConverter.convert/1)
     |> Commands.command()
     |> IO.puts()
