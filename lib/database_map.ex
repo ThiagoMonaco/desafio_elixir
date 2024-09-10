@@ -7,7 +7,7 @@ defmodule DatabaseMap do
   end
 
   def init(nil) do
-    {:ok, [%{}]}
+    {:ok, [%{}, %{}]}
   end
 
   def handle_call({:get, key}, _from, state) do
@@ -25,7 +25,13 @@ defmodule DatabaseMap do
   end
 
   def handle_call({:start_transaction}, _from, state) do
-    {:reply, {:ok, length(state)}, state ++ [%{}]}
+    {:reply, {:ok, length(state) - 1}, state ++ [%{}]}
+  end
+
+  def handle_call({:commit_transaction}, _from, [db, state]) do
+    new_state = [Map.merge(db, state), %{}]
+
+    {:reply, {:ok, 0}, new_state}
   end
 
   def handle_call({:commit_transaction}, _from, state) do
@@ -33,12 +39,16 @@ defmodule DatabaseMap do
     [new_head | new_tail] = tail
     new_state = [Map.merge(new_head, head) | new_tail]
 
-    {:reply, {:ok, length(new_state) - 1}, Enum.reverse(new_state)}
+    {:reply, {:ok, max(length(new_state) - 2, 0)}, Enum.reverse(new_state)}
+  end
+
+  def handle_call({:rollback}, _from, [db, state]) do
+    {:reply, {:error, 0}, [db, state]}
   end
 
   def handle_call({:rollback}, _from, state) do
     [_head | tail] = Enum.reverse(state)
-    {:reply, {:ok, length(tail) - 1}, Enum.reverse(tail)}
+    {:reply, {:ok, max(length(tail) - 2, 0)}, Enum.reverse(tail)}
   end
 
   @spec search_key([map], String.t) :: map

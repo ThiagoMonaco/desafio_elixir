@@ -30,8 +30,10 @@ defmodule Commands do
 
   @spec command([String.t() | integer | boolean | nil]) :: String.t()
   def command(["ROLLBACK"] = _args) do
-    {:ok, deep} = DatabaseMap.rollback()
-    ~s(#{deep})
+    case DatabaseMap.rollback() do
+      {:ok, deep} -> ~s(#{deep})
+      {:error, _} -> ~s(ERR: "Not possible to rollback in this level of transaction")
+    end 
   end
 
   @spec command([String.t]) :: any
